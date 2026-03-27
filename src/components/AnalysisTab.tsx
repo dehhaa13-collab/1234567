@@ -40,20 +40,20 @@ export const AnalysisTab = () => {
             transition={{ duration: 0.3 }}
           >
             <p style={{ marginBottom: '2rem', color: 'var(--text-main)' }}>
-              Ты успешно зарегистрировалась! Теперь давай проверим твой профиль. <br/>
+              Ты успешно зарегистрировалась! Введи ссылку или просто свой никнейм (ник) в Instagram, и мы проверим твой профиль. <br/>
               <b>ИИ сделает честный и очень подробный аудит, покажет сильные стороны и подскажет, что улучшить.</b>
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
               
               <div>
-                <h4 style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: '#111827' }}>Ссылка на Instagram</h4>
+                <h4 style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: '#111827' }}>Ссылка на Instagram или никнейм</h4>
                 <div style={{ position: 'relative', maxWidth: '400px' }}>
                   <Search size={20} color="#9ca3af" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
                   <input 
                     type="text" 
                     className="input-field" 
-                    placeholder="https://instagram.com/tvoi_profill" 
+                    placeholder="@tvoi_nik или ссылка" 
                     style={{ paddingLeft: '3rem' }}
                     value={url}
                     onChange={(e) => setUrl(e.target.value)}
