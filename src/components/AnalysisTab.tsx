@@ -214,9 +214,44 @@ export const AnalysisTab = ({ userProfile }: { userProfile: UserProfile | null }
               </div>
             </div>
 
+            {/* Блок: Глубокий анализ визуала и ленты */}
+            <div style={{ marginTop: '4rem', marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ padding: '0.75rem', background: '#fdf2f8', borderRadius: '16px' }}><Search color="#ec4899" size={28} /></div>
+                <h2 style={{ fontSize: '1.75rem', margin: 0, fontFamily: 'Outfit' }}>Глубокий анализ ленты</h2>
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#111827', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899, #8b5cf6)' }} />
+                    Цветотип и Эстетика
+                  </h4>
+                  <p style={{ color: '#4b5563', lineHeight: 1.6 }}>Сейчас в профиле смешано несколько стилей. Фотографии сняты при разном свете. <br/><br/><strong>Решение:</strong> Закрепи 2 фирменных цвета (например, пастельный беж и пыльная роза). Делай фото при естественном свете у окна. Дорого = минимализм.</p>
+                </div>
+
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#111827', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#f59e0b' }} />
+                    Актуальные (Highlights)
+                  </h4>
+                  <p style={{ color: '#4b5563', lineHeight: 1.6 }}>Много лишнего или пустые обложки. Клиент не находит нужное.<br/><br/><strong>Решение:</strong> Оставь 4 закрепленных истории с красивыми обложками-иконками: <br/>1. Отзывы<br/>2. Прайс<br/>3. До/После<br/>4. Обучение/Обо мне.</p>
+                </div>
+
+                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', gridColumn: '1 / -1' }}>
+                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#111827', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#3b82f6' }} />
+                    Анализ Reels
+                  </h4>
+                  <p style={{ color: '#4b5563', lineHeight: 1.6 }}>Тематика видео отличная, вы показываете крутые процессы! Но чтобы зрители не пролистывали видео, добавьте яркие интригующие заголовки (хуки) прямо на обложки. Динамичный монтаж (смена кадров каждые 3 секунды) удержит внимание. Загляни во вкладку «Контент-план», мы подготовили 10 готовых сценариев для {userProfile?.niche || 'тебя'}!</p>
+                </div>
+              </div>
+            </div>
+
             <button onClick={() => setStep('form')} style={{ marginTop: '2rem', padding: '1rem 2rem', cursor: 'pointer', background: 'white', border: '1px solid #111827', borderRadius: '99px', fontWeight: 600, fontFamily: 'Outfit', display: 'block', width: '100%', textAlign: 'center' }}>
               Проанализировать другой профиль
             </button>
+
           </motion.div>
         )}
       </AnimatePresence>
