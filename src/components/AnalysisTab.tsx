@@ -1,108 +1,196 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Search, Image as ImageIcon, Sparkles, CheckCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Search, Sparkles, CheckCircle, AlertTriangle } from 'lucide-react';
+
+// Жесткие и честные ответы ИИ
+const aiResults = {
+  avatar: "Очень слабо. Лицо не рассмотреть, задний фон отвлекает. Как клиент должен довериться вашей экспертности, если вы прячетесь за мыльной фотографией?",
+  bio: "Сплошная вода. Фразы 'Красота спасет мир' и 'Делаю с любовью' больше не продают. Нет уникального торгового предложения (УТП) и непонятно, как именно к вам записаться.",
+  visuals: "Ощущение хаоса. Фотографии при разном свете: где-то желтушно, где-то пересвет. Нет единого стиля, лента просто не цепляет глаз богатого клиента.",
+  colorType: "Отсутствует. Вы не определились с фирменными цветами профиля. Лента выглядит как винегрет из случайных снимков.",
+  reels: "Хуков (крючков внимания) нет. Скучный показ процесса под неактуальную музыку. Зритель свайпает ваше видео уже на 2-й секунде. Нужно срочно писать цепляющие заголовки на обложках!"
+};
 
 export const AnalysisTab = () => {
+  const [step, setStep] = useState<'form' | 'analyzing' | 'results'>('form');
   const [url, setUrl] = useState('');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [results, setResults] = useState<any>(null);
+  const [experience, setExperience] = useState('');
+  const [problem, setProblem] = useState('');
 
-  const handleAnalyze = () => {
-    if (!url) return;
-    setIsAnalyzing(true);
-    setResults(null);
+  const handleStartAnalysis = () => {
+    if (!url || !experience || !problem) return;
+    setStep('analyzing');
     
-    // Симуляция работы ИИ
+    // Имитация задержки загрузки
     setTimeout(() => {
-      setIsAnalyzing(false);
-      setResults({
-        avatar: "Хорошая, портретная аватарка, но не хватает контраста. Рекомендуется использовать однотонный фон, чтобы лицо выделялось.",
-        bio: "Описание четкое, но нет призыва к действию (CTA) и оффера. Клиенту непонятно, как именно к вам записаться.",
-        visuals: "Теплые пастельные тона (розовый, бежевый). Отлично подходит для бьюти-сферы и создает доверительную атмосферу.",
-        colorType: "Весенне-летняя палитра. Преобладает светлый нежный тон.",
-        reels: "Тематика рилсов отличная ('до/после', процесс работы), но не хватает хуков (заголовков) на обложках. Зритель не понимает о чем видео до его просмотра."
-      });
-    }, 2500);
+      setStep('results');
+    }, 3500);
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, x: -10 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 10 }}
-      transition={{ duration: 0.3 }}
-    >
+    <div style={{ position: 'relative' }}>
       <h2 style={{ marginBottom: '1rem', fontSize: '1.75rem' }}>Аудит твоего Instagram (Ремонт)</h2>
-      <p style={{ marginBottom: '2rem', color: 'var(--text-main)' }}>Вставь ссылку на свой профиль или загрузи скриншот шапки, и наш ИИ найдет слабые места и зоны роста для привлечения клиентов.</p>
       
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-        <div style={{ flex: '1 1 300px', position: 'relative' }}>
-          <Search size={20} color="#9ca3af" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-          <input 
-            type="text" 
-            className="input-field" 
-            placeholder="https://instagram.com/tvoi_profill" 
-            style={{ paddingLeft: '3rem' }}
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </div>
-        <button className="btn-primary" onClick={handleAnalyze} disabled={isAnalyzing}>
-          {isAnalyzing ? 'Анализируем...' : <>
-            <Sparkles size={18} /> Аудит профиля
-          </>}
-        </button>
-        <div 
-          title="Загрузить скриншот"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '56px', height: '56px', borderRadius: '16px', background: '#f3f4f6', cursor: 'pointer', transition: 'all 0.3s ease' }}
-          onMouseOver={(e) => e.currentTarget.style.background = '#e5e7eb'}
-          onMouseOut={(e) => e.currentTarget.style.background = '#f3f4f6'}
-        >
-          <ImageIcon size={22} color="#6b7280" />
-        </div>
-      </div>
+      <AnimatePresence mode="wait">
+        
+        {/* Шаг 1: Опросник перед анализом */}
+        {step === 'form' && (
+          <motion.div
+            key="form"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 10 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p style={{ marginBottom: '2rem', color: 'var(--text-main)' }}>
+              Чтобы ИИ дал максимально точную оценку, ответьте на пару простых вопросов и укажите ссылку на профиль. <br/>
+              <b>Внимание: ИИ критикует жестко и честно, указывая прямо на все косяки профиля.</b>
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              
+              {/* Ник/Ссылка */}
+              <div>
+                <h4 style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: '#111827' }}>1. Ссылка на Instagram или ваш ник</h4>
+                <div style={{ position: 'relative', maxWidth: '400px' }}>
+                  <Search size={20} color="#9ca3af" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+                  <input 
+                    type="text" 
+                    className="input-field" 
+                    placeholder="https://instagram.com/tvoi_profill" 
+                    style={{ paddingLeft: '3rem' }}
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                  />
+                </div>
+              </div>
 
-      {isAnalyzing && (
-        <motion.div 
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-          style={{ marginTop: '3rem', textAlign: 'center', padding: '3rem 0' }}
-        >
-          <div style={{ width: '48px', height: '48px', border: '4px solid #fdf2f8', borderTop: '4px solid #ec4899', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
-          <p style={{ marginTop: '1rem', color: 'var(--primary)', fontWeight: 600, fontSize: '1.1rem' }}>ИИ сканирует твой визуал и шапку...</p>
-          <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-        </motion.div>
-      )}
+              {/* Опыт */}
+              <div>
+                <h4 style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: '#111827' }}>2. Как давно вы в бьюти-сфере?</h4>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  {['До 1 года', '1-3 года', 'Более 3 лет'].map(opt => (
+                    <button 
+                      key={opt}
+                      onClick={() => setExperience(opt)}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '99px',
+                        border: experience === opt ? '2px solid #ec4899' : '2px solid #e5e7eb',
+                        background: experience === opt ? '#fdf2f8' : 'transparent',
+                        color: experience === opt ? '#db2777' : '#4b5563',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-      {results && !isAnalyzing && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          style={{ marginTop: '3rem' }}
-        >
-          <h3 style={{ fontSize: '1.5rem', marginBottom: '1.5rem', color: '#111827' }}>План «ремонта» профиля</h3>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
-            <div className="result-card">
-              <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', color: '#111827' }}><CheckCircle size={20} color="#ec4899" /> Аватарка</h4>
-              <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.6' }}>{results.avatar}</p>
+              {/* Проблема */}
+              <div>
+                <h4 style={{ marginBottom: '0.75rem', fontSize: '1.1rem', color: '#111827' }}>3. Какая сейчас главная проблема?</h4>
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  {['Мало клиентов', 'Не возвращаются', 'Нет просмотров', 'Сложности с контентом'].map(opt => (
+                    <button 
+                      key={opt}
+                      onClick={() => setProblem(opt)}
+                      style={{
+                        padding: '0.5rem 1rem',
+                        borderRadius: '99px',
+                        border: problem === opt ? '2px solid #8b5cf6' : '2px solid #e5e7eb',
+                        background: problem === opt ? '#f5f3ff' : 'transparent',
+                        color: problem === opt ? '#7c3aed' : '#4b5563',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ marginTop: '1rem' }}>
+                <button 
+                  className="btn-primary" 
+                  onClick={handleStartAnalysis} 
+                  disabled={!url || !experience || !problem}
+                  style={{ opacity: (!url || !experience || !problem) ? 0.5 : 1 }}
+                >
+                  <Sparkles size={18} /> Сделать жесткий разбор
+                </button>
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+
+        {/* Шаг 2: Имитация анализа ИИ */}
+        {step === 'analyzing' && (
+          <motion.div 
+            key="analyzing"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{ textAlign: 'center', padding: '4rem 0' }}
+          >
+            <div style={{ width: '56px', height: '56px', border: '4px solid #fdf2f8', borderTop: '4px solid #ec4899', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
+            <p style={{ marginTop: '1.5rem', color: 'var(--text-heading)', fontWeight: 600, fontSize: '1.25rem' }}>ИИ сканирует твой профиль...</p>
+            <p style={{ color: '#db2777', marginTop: '0.5rem' }}>Анализируем УТП, актуальность визуалов и хуки.</p>
+            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+          </motion.div>
+        )}
+
+        {/* Шаг 3: Честные Результаты */}
+        {step === 'results' && (
+          <motion.div 
+            key="results"
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}
+            style={{ marginTop: '1rem' }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', background: '#fef2f2', padding: '1rem', borderRadius: '12px', border: '1px solid #fecaca' }}>
+              <AlertTriangle color="#ef4444" size={24} />
+              <p style={{ color: '#991b1b', fontSize: '0.95rem' }}>
+                <strong>Без обид, только факты.</strong> Чтобы начать получать клиентов, профиль нужно почистить. В текущем виде он не продает.
+              </p>
             </div>
             
-            <div className="result-card">
-              <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', color: '#111827' }}><CheckCircle size={20} color="#ec4899" /> Шапка профиля и Био</h4>
-              <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.6' }}>{results.bio}</p>
-            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.25rem' }}>
+              
+              <div className="result-card" style={{ borderLeftColor: '#ef4444' }}>
+                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', color: '#111827' }}><CheckCircle size={20} color="#ef4444" /> Аватарка</h4>
+                <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.6' }}>{aiResults.avatar}</p>
+              </div>
+              
+              <div className="result-card" style={{ borderLeftColor: '#ef4444' }}>
+                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', color: '#111827' }}><CheckCircle size={20} color="#ef4444" /> Шапка профиля и Био</h4>
+                <p style={{ color: '#4b5563', fontSize: '1rem', lineHeight: '1.6' }}>{aiResults.bio}</p>
+              </div>
 
-            <div className="result-card" style={{ gridColumn: '1 / -1' }}>
-              <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', color: '#111827' }}><CheckCircle size={20} color="#ec4899" /> Визуал и Reels</h4>
-              <div style={{ background: '#fdf2f8', padding: '1.25rem', borderRadius: '12px', marginTop: '1rem' }}>
-                <p style={{ marginBottom: '0.75rem' }}><strong style={{ color: '#db2777' }}>Цветотип:</strong> <span style={{ color: '#374151' }}>{results.colorType}</span></p>
-                <p style={{ marginBottom: '0.75rem' }}><strong style={{ color: '#db2777' }}>Общий визуал:</strong> <span style={{ color: '#374151' }}>{results.visuals}</span></p>
-                <p><strong style={{ color: '#db2777' }}>Рилсы:</strong> <span style={{ color: '#374151' }}>{results.reels}</span></p>
+              <div className="result-card" style={{ gridColumn: '1 / -1', borderLeftColor: '#ef4444' }}>
+                <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.75rem', color: '#111827' }}><CheckCircle size={20} color="#ef4444" /> Визуал и Reels</h4>
+                <div style={{ background: '#fdf2f8', padding: '1.25rem', borderRadius: '12px', marginTop: '1rem' }}>
+                  <p style={{ marginBottom: '0.75rem' }}><strong style={{ color: '#db2777' }}>Общий визуал:</strong> <span style={{ color: '#374151' }}>{aiResults.visuals}</span></p>
+                  <p style={{ marginBottom: '0.75rem' }}><strong style={{ color: '#db2777' }}>Цветотип:</strong> <span style={{ color: '#374151' }}>{aiResults.colorType}</span></p>
+                  <p><strong style={{ color: '#db2777' }}>Оценка Рилсов:</strong> <span style={{ color: '#374151' }}>{aiResults.reels}</span></p>
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-      )}
-    </motion.div>
+
+            {/* Кнопка сброса */}
+            <button onClick={() => setStep('form')} style={{ marginTop: '2rem', padding: '0.75rem 1.5rem', cursor: 'pointer', background: 'transparent', border: '1px solid #111827', borderRadius: '99px', fontWeight: 600, fontFamily: 'Outfit' }}>
+              Пройти анализ заново
+            </button>
+          </motion.div>
+        )}
+
+      </AnimatePresence>
+    </div>
   );
 };
