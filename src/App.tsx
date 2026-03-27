@@ -1,11 +1,11 @@
-import React from 'react';
+import { MainLayout } from './layouts/MainLayout';
+import { Home } from './pages/Home';
 
-export const App: React.FC = () => {
+export const App = () => {
   return (
-    <div>
-      <h1>Привет!</h1>
-      <p>Проект полностью очищен и готов к разработке. Давай начнем!</p>
-    </div>
+    <MainLayout>
+      <Home />
+    </MainLayout>
   );
 };
 
