@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { PlaySquare, Image as ImageIcon, Video } from 'lucide-react';
+import { PlaySquare, Image as ImageIcon, Video, ChevronRight } from 'lucide-react';
 import type { UserProfile } from '../App';
 
 const getScenarios = (_niche: string, name: string) => {
@@ -20,7 +20,7 @@ const getScenarios = (_niche: string, name: string) => {
   return common;
 };
 
-export const ContentPlanTab = ({ userProfile }: { userProfile: UserProfile | null }) => {
+export const ContentPlanTab = ({ userProfile, onNext }: { userProfile: UserProfile | null, onNext: () => void }) => {
   const scenarios = getScenarios(userProfile?.niche || '', userProfile?.name || '');
 
   return (
@@ -82,6 +82,10 @@ export const ContentPlanTab = ({ userProfile }: { userProfile: UserProfile | nul
           </motion.div>
         ))}
       </div>
+
+      <button onClick={onNext} className="btn-primary" style={{ display: 'block', margin: '3rem auto 0 auto', padding: '1.25rem 2.5rem', fontSize: '1.1rem' }}>
+        Загрузить видео в ИИ-Монтажер <ChevronRight size={20} style={{ display: 'inline', verticalAlign: 'middle', marginTop: '-2px' }} />
+      </button>
     </motion.div>
   );
 };

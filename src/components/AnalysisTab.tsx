@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, AlertTriangle, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { Search, Sparkles, AlertTriangle, CheckCircle2, Image as ImageIcon, ChevronRight } from 'lucide-react';
 import type { UserProfile } from '../App';
 
 // Helpers for personalized variants
@@ -40,7 +40,7 @@ const getBioVariants = (name: string, niche: string) => {
   }
 };
 
-export const AnalysisTab = ({ userProfile }: { userProfile: UserProfile | null }) => {
+export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile | null, onNext: () => void }) => {
   const [step, setStep] = useState<'form' | 'analyzing' | 'results'>('form');
   const [url, setUrl] = useState('');
   const [selectedBio, setSelectedBio] = useState<number>(0);
@@ -248,9 +248,19 @@ export const AnalysisTab = ({ userProfile }: { userProfile: UserProfile | null }
               </div>
             </div>
 
-            <button onClick={() => setStep('form')} style={{ marginTop: '2rem', padding: '1rem 2rem', cursor: 'pointer', background: 'white', border: '1px solid #111827', borderRadius: '99px', fontWeight: 600, fontFamily: 'Outfit', display: 'block', width: '100%', textAlign: 'center' }}>
-              Проанализировать другой профиль
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button onClick={() => setStep('form')} style={{ flex: 1, padding: '1rem 2rem', cursor: 'pointer', background: 'transparent', border: '1px solid #111827', borderRadius: '99px', fontWeight: 600, fontFamily: 'Outfit', textAlign: 'center' }}>
+                Попробовать другой ник
+              </button>
+              
+              <button 
+                onClick={onNext} 
+                className="btn-primary" 
+                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
+              >
+                Перейти к Этапу 2 (Сценарии) <ChevronRight size={20} />
+              </button>
+            </div>
 
           </motion.div>
         )}
