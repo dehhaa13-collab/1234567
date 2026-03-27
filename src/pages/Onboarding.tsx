@@ -1,20 +1,22 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, Heart, Crown } from 'lucide-react';
+import type { UserProfile } from '../App';
 
 interface OnboardingProps {
-  onComplete: () => void;
+  onComplete: (profile: UserProfile) => void;
 }
 
 export const Onboarding = ({ onComplete }: OnboardingProps) => {
   const [step, setStep] = useState(1);
   const [name, setName] = useState('');
+  const [niche, setNiche] = useState('');
   const [experience, setExperience] = useState('');
   const [problem, setProblem] = useState('');
 
   const nextStep = () => {
-    if (step === 3) {
-      onComplete(); // Завершить регистрацию
+    if (step === 4) {
+      onComplete({ name, niche, experience, problem });
     } else {
       setStep(step + 1);
     }
@@ -83,8 +85,8 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
           
           <div style={{ background: '#f3f4f6', height: '6px', borderRadius: '99px', marginBottom: '3rem', overflow: 'hidden' }}>
             <motion.div 
-              initial={{ width: '33%' }}
-              animate={{ width: `${(step / 3) * 100}%` }}
+              initial={{ width: '25%' }}
+              animate={{ width: `${(step / 4) * 100}%` }}
               transition={{ duration: 0.4 }}
               style={{ height: '100%', background: 'linear-gradient(90deg, #ec4899, #8b5cf6)', borderRadius: '99px' }}
             />
@@ -93,7 +95,7 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 1 из 3</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 1 из 4</span>
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem', marginTop: '0.5rem', fontFamily: 'Outfit' }}>Давай знакомиться!</h2>
                 <p style={{ color: 'var(--text-main)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Как к тебе обращаться?</p>
                 
@@ -114,7 +116,50 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
 
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 2 из 3</span>
+                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 2 из 4</span>
+                <h2 style={{ fontSize: '2rem', marginBottom: '1rem', marginTop: '0.5rem', fontFamily: 'Outfit' }}>В какой сфере бьюти ты?</h2>
+                <p style={{ color: 'var(--text-main)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Мы адаптируем советы и ИИ конкретно под твою нишу.</p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {['hair', 'permanent', 'lashes', 'nails'].map(opt => {
+                    const titles: Record<string, string> = {
+                      hair: 'Волосы (Стилист)',
+                      permanent: 'Перманентный макияж',
+                      lashes: 'Лешмейкер / Бровист',
+                      nails: 'Нейл-мастер'
+                    };
+                    return (
+                      <button 
+                        key={opt}
+                        onClick={() => setNiche(opt)}
+                        style={{
+                          padding: '1.25rem',
+                          borderRadius: '16px',
+                          border: niche === opt ? '2px solid #ec4899' : '2px solid #f3f4f6',
+                          background: niche === opt ? '#fdf2f8' : 'white',
+                          color: niche === opt ? '#db2777' : '#4b5563',
+                          fontWeight: 600,
+                          fontSize: '1.1rem',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          textAlign: 'left'
+                        }}
+                      >
+                        {titles[opt]}
+                      </button>
+                    )
+                  })}
+                </div>
+
+                <button className="btn-primary" onClick={nextStep} disabled={!niche} style={{ opacity: !niche ? 0.5 : 1, width: '100%', marginTop: '2rem', padding: '1rem' }}>
+                  Далее <ArrowRight size={18} />
+                </button>
+              </motion.div>
+            )}
+
+            {step === 3 && (
+              <motion.div key="step3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#ec4899', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 3 из 4</span>
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem', marginTop: '0.5rem', fontFamily: 'Outfit' }}>Твой опыт в бьюти</h2>
                 <p style={{ color: 'var(--text-main)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Это поможет нам давать более точные советы.</p>
                 
@@ -147,9 +192,9 @@ export const Onboarding = ({ onComplete }: OnboardingProps) => {
               </motion.div>
             )}
 
-            {step === 3 && (
-              <motion.div key="step3" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
-                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 3 из 3</span>
+            {step === 4 && (
+              <motion.div key="step4" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
+                <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#8b5cf6', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Шаг 4 из 4</span>
                 <h2 style={{ fontSize: '2rem', marginBottom: '1rem', marginTop: '0.5rem', fontFamily: 'Outfit' }}>Главная проблема сейчас?</h2>
                 <p style={{ color: 'var(--text-main)', marginBottom: '2.5rem', fontSize: '1.1rem' }}>Мы построим индивидуальный план под твою боль.</p>
                 

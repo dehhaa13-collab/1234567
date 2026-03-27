@@ -3,22 +3,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { BarChart3 } from 'lucide-react';
 import { HeroSection } from '../components/HeroSection';
 import { AnalysisTab } from '../components/AnalysisTab';
-import { StrategyTab } from '../components/StrategyTab';
-import type { StageType } from '../App';
+import type { UserProfile } from '../App';
 
 interface HomeProps {
-  stage: StageType;
-  setStage: (stage: StageType) => void;
+  userProfile: UserProfile | null;
 }
 
-export const Home = ({ stage }: HomeProps) => {
+export const Home = ({ userProfile }: HomeProps) => {
   const [activeTab, setActiveTab] = useState('analysis');
 
-  if (stage === 'strategy') {
-    return <StrategyTab />;
-  }
-
-  // Stage 1: Analysis Flow
   return (
     <div className="app-container" style={{ padding: '0 2rem 2rem 2rem', marginTop: '-2rem' }}>
       <HeroSection />
@@ -46,7 +39,7 @@ export const Home = ({ stage }: HomeProps) => {
 
         {/* Tab Content */}
         <AnimatePresence mode="wait">
-          {activeTab === 'analysis' && <AnalysisTab key="analysis" />}
+          {activeTab === 'analysis' && <AnalysisTab key="analysis" userProfile={userProfile} />}
 
           {activeTab === 'plan' && (
             <motion.div key="plan" initial={{ opacity: 0 }} animate={{ opacity: 1 }} style={{ padding: '2rem 0' }}>
