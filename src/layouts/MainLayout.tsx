@@ -11,7 +11,7 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1.5rem 2rem', maxWidth: '1200px', margin: '0 auto' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           <Sparkles color="#ec4899" size={28} />
-          <h1 style={{ fontSize: '1.5rem', margin: 0, fontFamily: 'Outfit' }}>Content Factory</h1>
+          <span style={{ fontSize: '1.5rem', margin: 0, fontFamily: 'Outfit', fontWeight: 700, color: 'var(--text-heading)' }}>Content Factory</span>
         </div>
         
         {/* Simple Login Button placed back without the Switcher */}

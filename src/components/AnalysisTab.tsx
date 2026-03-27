@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, AlertTriangle, CheckCircle2, Image as ImageIcon, ChevronRight } from 'lucide-react';
+import { Search, Sparkles, AlertTriangle, CheckCircle2, ChevronRight } from 'lucide-react';
 import type { UserProfile } from '../App';
 
-// Helpers for personalized variants
 const getBioVariants = (name: string, niche: string) => {
   const userName = name || 'Мастер';
   switch (niche) {
@@ -60,7 +59,6 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
       
       <AnimatePresence mode="wait">
         
-        {/* Шаг 1: Форма */}
         {step === 'form' && (
           <motion.div
             key="form"
@@ -71,7 +69,9 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
           >
             <h2 style={{ marginBottom: '1rem', fontSize: '1.75rem' }}>Аудит твоего Instagram</h2>
             <p style={{ marginBottom: '2rem', color: 'var(--text-main)' }}>
-              Отлично, {userProfile?.name || 'мастер'}! Введи ссылку или никнейм. ИИ проанализирует профиль с учетом твоей ниши ({userProfile?.niche}) и твоей главной боли ({userProfile?.problem}).
+              Отлично, {userProfile?.name || 'мастер'}! Введи ссылку или никнейм. ИИ проанализирует профиль с учетом твоей ниши ({
+                { hair: 'волосы', permanent: 'перманент', lashes: 'ресницы/брови', nails: 'ногти' }[userProfile?.niche || ''] || 'бьюти'
+              }) и твоей главной боли ({userProfile?.problem?.toLowerCase() || 'нехватка клиентов'}).
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -98,7 +98,6 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
           </motion.div>
         )}
 
-        {/* Шаг 2: Загрузка */}
         {step === 'analyzing' && (
           <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', padding: '4rem 0' }}>
             <div style={{ width: '56px', height: '56px', border: '4px solid #fdf2f8', borderTop: '4px solid #ec4899', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
@@ -108,24 +107,22 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
           </motion.div>
         )}
 
-        {/* Шаг 3: Развернутые результаты и визуал */}
         {step === 'results' && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginTop: '0.5rem' }}>
             
-            {/* Блок: Диагноз проблемы */}
             <div style={{ background: '#fef2f2', padding: '1.5rem', borderRadius: '16px', border: '1px solid #fecaca', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
                 <AlertTriangle color="#ef4444" size={24} />
                 <h3 style={{ margin: 0, color: '#991b1b', fontSize: '1.25rem' }}>Почему у тебя {userProfile?.problem.toLowerCase() || 'мало клиентов'}?</h3>
               </div>
               <p style={{ color: '#7f1d1d', lineHeight: 1.6, margin: 0 }}>
-                Твой профиль — это твоя визитка. Сейчас клиенты заходят на страницу и не сразу понимают, почему стоит выбрать именно тебя. Фон на аватарке сливается, а в шапке профиля не хватает сильного предложения (УТП), которое зацепит их с первой секунды. <br/><br/>
-                <strong>Но не переживай, мы здесь именно для этого! Ниже мы покажем, как легко и красиво это исправить.</strong>
+                Твой профиль — это твоя визитка. Сейчас клиенты заходят на страницу и не сразу понимают, почему стоит выбрать именно тебя. В шапке профиля не хватает сильного предложения (УТП), которое зацепит их с первой секунды. <br/><br/>
+                <strong>Но не переживай, мы здесь именно для этого! Выбирай свой новый стиль ниже.</strong>
               </p>
             </div>
 
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Твой профиль 2.0 (Выбери шапку)</h2>
-            <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>Мы создали 3 мощных варианта специально для тебя. Кликни на тот, который нравится больше, и посмотри, как он будет выглядеть в Instagram.</p>
+            <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Идеальная шапка: выбери вариант</h2>
+            <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>Мы создали 3 мощных варианта специально для тебя. Кликни на тот, который нравится больше.</p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginBottom: '3rem' }}>
               {bioVariants.map((bio, index) => (
@@ -149,102 +146,25 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
               ))}
             </div>
 
-            {/* Блок: Визуализация Instagram */}
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Визуализация результата ✨</h2>
+            <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Новая энергия профиля ✨</h2>
             
             <div style={{ 
-              background: 'linear-gradient(135deg, #111827, #374151, #000)', 
-              padding: '3rem 1rem', 
               borderRadius: '24px', 
-              display: 'flex', 
-              justifyContent: 'center',
               position: 'relative',
-              overflow: 'hidden'
+              overflow: 'hidden',
+              height: '300px',
+              marginBottom: '2rem'
             }}>
-              {/* Decorative premium elements */}
-              <div style={{ position: 'absolute', top: '-10%', left: '-10%', width: '300px', height: '300px', background: '#ec4899', filter: 'blur(100px)', opacity: 0.3, borderRadius: '50%' }} />
-              <div style={{ position: 'absolute', bottom: '-10%', right: '-10%', width: '300px', height: '300px', background: '#8b5cf6', filter: 'blur(100px)', opacity: 0.3, borderRadius: '50%' }} />
+              <img 
+                src="https://images.unsplash.com/photo-1492613146440-c11c50058b87?w=1200&h=600&fit=crop" 
+                alt="Luxury Aesthetic"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.8), transparent)' }} />
               
-              {/* Instagram Mobile Mockup */}
-              <div style={{ 
-                background: 'white', 
-                width: '100%', 
-                maxWidth: '360px', 
-                borderRadius: '32px',
-                padding: '1.5rem',
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
-                position: 'relative',
-                zIndex: 1
-              }}>
-                {/* Header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', fontWeight: 600 }}>
-                  <span>{url.replace('https://instagram.com/', '').replace('@', '') || 'tvoi_nik'}</span>
-                  <span>•••</span>
-                </div>
-                
-                {/* Profile Info */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1.5rem' }}>
-                  <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)', padding: '3px' }}>
-                    <div style={{ width: '100%', height: '100%', borderRadius: '50%', background: 'url(https://images.unsplash.com/photo-1616091093714-c64882e9ab55?w=200&h=200&fit=crop) center/cover', border: '3px solid white' }} />
-                  </div>
-                  <div style={{ display: 'flex', gap: '1.25rem', textAlign: 'center' }}>
-                    <div><strong style={{ display: 'block' }}>120</strong><span style={{ fontSize: '0.8rem', color: '#666' }}>Post</span></div>
-                    <div><strong style={{ display: 'block' }}>4.5k</strong><span style={{ fontSize: '0.8rem', color: '#666' }}>Follow</span></div>
-                    <div><strong style={{ display: 'block' }}>350</strong><span style={{ fontSize: '0.8rem', color: '#666' }}>Follow</span></div>
-                  </div>
-                </div>
-
-                {/* Bio text directly injected from state */}
-                <div style={{ marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: 1.5 }}>
-                  <pre style={{ margin: 0, fontFamily: 'inherit', color: '#111827', whiteSpace: 'pre-wrap' }}>
-                    {bioVariants[selectedBio]}
-                  </pre>
-                </div>
-
-                {/* Grid */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
-                  {[...Array(6)].map((_, i) => (
-                    <div key={i} style={{ aspectRatio: '1', background: '#f3f4f6', position: 'relative' }}>
-                       {i === 0 && <ImagePlaceholder color="#ec4899" />}
-                       {i === 1 && <ImagePlaceholder color="#8b5cf6" />}
-                       {i === 4 && <ImagePlaceholder color="#ec4899" />}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Блок: Глубокий анализ визуала и ленты */}
-            <div style={{ marginTop: '4rem', marginBottom: '2rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                <div style={{ padding: '0.75rem', background: '#fdf2f8', borderRadius: '16px' }}><Search color="#ec4899" size={28} /></div>
-                <h2 style={{ fontSize: '1.75rem', margin: 0, fontFamily: 'Outfit' }}>Глубокий анализ ленты</h2>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#111827', marginBottom: '1rem', fontSize: '1.1rem' }}>
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: 'linear-gradient(135deg, #ec4899, #8b5cf6)' }} />
-                    Цветотип и Эстетика
-                  </h4>
-                  <p style={{ color: '#4b5563', lineHeight: 1.6 }}>Сейчас в профиле смешано несколько стилей. Фотографии сняты при разном свете. <br/><br/><strong>Решение:</strong> Закрепи 2 фирменных цвета (например, пастельный беж и пыльная роза). Делай фото при естественном свете у окна. Дорого = минимализм.</p>
-                </div>
-
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
-                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#111827', marginBottom: '1rem', fontSize: '1.1rem' }}>
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#f59e0b' }} />
-                    Актуальные (Highlights)
-                  </h4>
-                  <p style={{ color: '#4b5563', lineHeight: 1.6 }}>Много лишнего или пустые обложки. Клиент не находит нужное.<br/><br/><strong>Решение:</strong> Оставь 4 закрепленных истории с красивыми обложками-иконками: <br/>1. Отзывы<br/>2. Прайс<br/>3. До/После<br/>4. Обучение/Обо мне.</p>
-                </div>
-
-                <div style={{ background: 'white', padding: '1.5rem', borderRadius: '20px', border: '1px solid #e5e7eb', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', gridColumn: '1 / -1' }}>
-                  <h4 style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#111827', marginBottom: '1rem', fontSize: '1.1rem' }}>
-                    <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#3b82f6' }} />
-                    Анализ Reels
-                  </h4>
-                  <p style={{ color: '#4b5563', lineHeight: 1.6 }}>Тематика видео отличная, вы показываете крутые процессы! Но чтобы зрители не пролистывали видео, добавьте яркие интригующие заголовки (хуки) прямо на обложки. Динамичный монтаж (смена кадров каждые 3 секунды) удержит внимание. Загляни во вкладку «Контент-план», мы подготовили 10 готовых сценариев для {userProfile?.niche || 'тебя'}!</p>
-                </div>
+              <div style={{ position: 'absolute', bottom: '2rem', left: '2rem', maxWidth: '400px' }}>
+                <h3 style={{ color: 'white', fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'Outfit' }}>Продающий визуал</h3>
+                <p style={{ color: '#d1d5db', lineHeight: 1.5 }}>Такой должна быть эстетика твоего бренда. Клиенты готовы платить больше за красивую упаковку.</p>
               </div>
             </div>
 
@@ -258,7 +178,7 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
                 className="btn-primary" 
                 style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
               >
-                Перейти к Этапу 2 (Сценарии) <ChevronRight size={20} />
+                Перейти к Этапу 2 (Разбор визуала) <ChevronRight size={20} />
               </button>
             </div>
 
@@ -268,10 +188,3 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
     </div>
   );
 };
-
-// Helper for fake grid
-const ImagePlaceholder = ({ color }: { color: string }) => (
-  <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0.1 }}>
-    <ImageIcon color={color} size={24} />
-  </div>
-);

@@ -9,6 +9,8 @@ export const ReelsGeneratorTab = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = () => {
+    setProgress(0);
+    setCurrentAction('');
     setStep('editing');
     
     // Simulate AI editing process
