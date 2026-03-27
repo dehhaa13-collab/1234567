@@ -1,57 +1,89 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, AlertTriangle, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Search, Sparkles, AlertTriangle, CheckCircle2, ChevronRight, XCircle } from 'lucide-react';
 import type { UserProfile } from '../App';
+import { askGemini } from '../services/gemini';
 
-const getBioVariants = (name: string, niche: string) => {
-  const userName = name || 'Мастер';
-  switch (niche) {
-    case 'hair':
-      return [
-        `${userName} | Твой мастер по волосам ✂️\nВывожу из черного без потери качества.\nЗапись на декабрь открыта ⬇️`,
-        `Идеальный блонд от ${userName} ✨\nСпасаю волосы после домашних экспериментов.\nКонсультация и прайс по ссылке:`,
-        `Стилист ${userName} | Сложные окрашивания\nДелаю укладки, которые держатся 3 дня.\nЖми на ссылку для записи ⬇️`
-      ];
-    case 'permanent':
-      return [
-        `${userName} | Естественный перманент 👄\nДарю +30 минут сна каждое утро.\nПудровые брови, которые не синеют ⬇️`,
-        `Перманентный макияж от ${userName} ✨\nЗабудь про косметичку.\nЗапись на идеальные губы по ссылке:`,
-        `Твой мастер ${userName} | Перманент\nБез боли. Без отеков. На 2 года.\nПосмотри мои работы и прайс ⬇️`
-      ];
-    case 'lashes':
-      return [
-        `${userName} | Взгляд на миллион 👁️\nБез эффекта куклы. Архитектура + укладка.\nСсылка на онлайн-запись ⬇️`,
-        `Лешмейкер ${userName} ✨\nОт 'лысого' века до лисьего взгляда за час.\nНоска 6 недель. Прайс здесь:`,
-        `Студия взгляда | Мастер ${userName} 🖤\nИдеальные пучки, которые не колятся.\nЗапишись ко мне на реснички ⬇️`
-      ];
-    case 'nails':
-      return [
-        `${userName} | Пилю настроение 💅\nГелевое укрепление. Носка 4+ недели.\nВыбери удобное окно по ссылке ⬇️`,
-        `Твой нейл-мастер ${userName} ✨\nТонко, крепко и без отслоек.\nФренч, градиент, стемпинг. Запись тут:`,
-        `Маникюр с любовью от ${userName} 🤍\nСтерильно на 100%. Чай, кофе и сериалы.\nОнлайн-запись ⬇️`
-      ];
-    default:
-      return [
-        `${userName} | Бьюти эксперт ✨\nДелаю вас красивее и увереннее.\nЗапись по ссылке ⬇️`,
-        `Твой мастер ${userName} 🤍\nИндивидуальный подход к каждому.\nПрайс и онлайн-запись тут:`,
-        `Beauty Room | ${userName}\nКачество, стерильность и уют.\nЖми на ссылку для записи ⬇️`
-      ];
-  }
+const nicheLabels: Record<string, string> = {
+  hair: 'волосы (стилист)',
+  permanent: 'перманентный макияж',
+  lashes: 'ресницы/брови',
+  nails: 'ногти (нейл-мастер)',
 };
 
 export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile | null, onNext: () => void }) => {
-  const [step, setStep] = useState<'form' | 'analyzing' | 'results'>('form');
+  const [step, setStep] = useState<'form' | 'analyzing' | 'results' | 'error'>('form');
   const [url, setUrl] = useState('');
   const [selectedBio, setSelectedBio] = useState<number>(0);
+  const [bioVariants, setBioVariants] = useState<string[]>([]);
+  const [analysisText, setAnalysisText] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const bioVariants = getBioVariants(userProfile?.name || '', userProfile?.niche || '');
+  const nicheLabel = nicheLabels[userProfile?.niche || ''] || 'бьюти';
 
-  const handleStartAnalysis = () => {
+  const handleStartAnalysis = async () => {
     if (!url) return;
     setStep('analyzing');
-    setTimeout(() => {
+    setErrorMessage('');
+
+    const prompt = `Ты — эксперт по Instagram-маркетингу для бьюти-мастеров. 
+Пользователь — мастер в нише "${nicheLabel}", зовут "${userProfile?.name || 'Мастер'}".
+Опыт: ${userProfile?.experience || 'не указан'}.
+Главная проблема: ${userProfile?.problem || 'нехватка клиентов'}.
+Ник или ссылка на Instagram: ${url}
+
+Задача 1: Напиши короткий анализ (3-4 предложения) — почему у такого мастера может быть проблема "${userProfile?.problem || 'мало клиентов'}" из-за неправильно оформленной шапки профиля. Будь конкретной и полезной, не общими фразами.
+
+Задача 2: Предложи ровно 3 варианта новой шапки профиля (био) для Instagram. Каждый вариант должен состоять из 3-4 строк и включать:
+- Имя + специализацию
+- УТП (уникальное торговое предложение)  
+- Призыв к действию
+
+ФОРМАТ ОТВЕТА (строго):
+---АНАЛИЗ---
+(текст анализа)
+---БИО1---
+(текст первого варианта био)
+---БИО2---
+(текст второго варианта био)
+---БИО3---
+(текст третьего варианта био)`;
+
+    const result = await askGemini(prompt);
+
+    if (!result.success) {
+      setErrorMessage(result.error || 'Произошла неизвестная ошибка');
+      setStep('error');
+      return;
+    }
+
+    try {
+      const text = result.text;
+      
+      const analysisMatch = text.match(/---АНАЛИЗ---([\s\S]*?)---БИО1---/);
+      const bio1Match = text.match(/---БИО1---([\s\S]*?)---БИО2---/);
+      const bio2Match = text.match(/---БИО2---([\s\S]*?)---БИО3---/);
+      const bio3Match = text.match(/---БИО3---([\s\S]*?)$/);
+
+      const analysis = analysisMatch?.[1]?.trim();
+      const bio1 = bio1Match?.[1]?.trim();
+      const bio2 = bio2Match?.[1]?.trim();
+      const bio3 = bio3Match?.[1]?.trim();
+
+      if (!analysis || !bio1 || !bio2 || !bio3) {
+        setErrorMessage('ИИ вернул ответ в неожиданном формате. Попробуйте ещё раз.');
+        setStep('error');
+        return;
+      }
+
+      setAnalysisText(analysis);
+      setBioVariants([bio1, bio2, bio3]);
+      setSelectedBio(0);
       setStep('results');
-    }, 3500);
+    } catch {
+      setErrorMessage('Не удалось обработать ответ ИИ. Попробуйте ещё раз.');
+      setStep('error');
+    }
   };
 
   return (
@@ -69,9 +101,7 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
           >
             <h2 style={{ marginBottom: '1rem', fontSize: '1.75rem' }}>Аудит твоего Instagram</h2>
             <p style={{ marginBottom: '2rem', color: 'var(--text-main)' }}>
-              Отлично, {userProfile?.name || 'мастер'}! Введи ссылку или никнейм. ИИ проанализирует профиль с учетом твоей ниши ({
-                { hair: 'волосы', permanent: 'перманент', lashes: 'ресницы/брови', nails: 'ногти' }[userProfile?.niche || ''] || 'бьюти'
-              }) и твоей главной боли ({userProfile?.problem?.toLowerCase() || 'нехватка клиентов'}).
+              Отлично, {userProfile?.name || 'мастер'}! Введи ссылку или никнейм. ИИ проанализирует профиль с учетом твоей ниши ({nicheLabel}) и твоей главной боли ({userProfile?.problem?.toLowerCase() || 'нехватка клиентов'}).
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
@@ -101,9 +131,36 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
         {step === 'analyzing' && (
           <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', padding: '4rem 0' }}>
             <div style={{ width: '56px', height: '56px', border: '4px solid #fdf2f8', borderTop: '4px solid #ec4899', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
-            <p style={{ marginTop: '1.5rem', color: 'var(--text-heading)', fontWeight: 600, fontSize: '1.25rem' }}>Смотрим глазами твоего клиента...</p>
-            <p style={{ color: '#db2777', marginTop: '0.5rem' }}>Анализируем УТП, аватарку и визуал.</p>
+            <p style={{ marginTop: '1.5rem', color: 'var(--text-heading)', fontWeight: 600, fontSize: '1.25rem' }}>ИИ анализирует профиль...</p>
+            <p style={{ color: '#db2777', marginTop: '0.5rem' }}>Запрос отправлен в Gemini. Ожидаем ответ.</p>
             <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
+          </motion.div>
+        )}
+
+        {step === 'error' && (
+          <motion.div key="error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ padding: '2rem 0' }}>
+            <div style={{ 
+              background: '#fef2f2', 
+              padding: '2rem', 
+              borderRadius: '20px', 
+              border: '1px solid #fecaca',
+              textAlign: 'center'
+            }}>
+              <XCircle color="#ef4444" size={48} style={{ margin: '0 auto 1rem auto' }} />
+              <h3 style={{ color: '#991b1b', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'Outfit' }}>
+                Не удалось выполнить анализ
+              </h3>
+              <p style={{ color: '#7f1d1d', lineHeight: 1.6, marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem auto' }}>
+                {errorMessage}
+              </p>
+              <button 
+                className="btn-primary" 
+                onClick={() => setStep('form')}
+                style={{ margin: '0 auto' }}
+              >
+                Попробовать ещё раз
+              </button>
+            </div>
           </motion.div>
         )}
 
@@ -113,16 +170,15 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
             <div style={{ background: '#fef2f2', padding: '1.5rem', borderRadius: '16px', border: '1px solid #fecaca', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
                 <AlertTriangle color="#ef4444" size={24} />
-                <h3 style={{ margin: 0, color: '#991b1b', fontSize: '1.25rem' }}>Почему у тебя {userProfile?.problem.toLowerCase() || 'мало клиентов'}?</h3>
+                <h3 style={{ margin: 0, color: '#991b1b', fontSize: '1.25rem' }}>Почему у тебя {userProfile?.problem?.toLowerCase() || 'мало клиентов'}?</h3>
               </div>
               <p style={{ color: '#7f1d1d', lineHeight: 1.6, margin: 0 }}>
-                Твой профиль — это твоя визитка. Сейчас клиенты заходят на страницу и не сразу понимают, почему стоит выбрать именно тебя. В шапке профиля не хватает сильного предложения (УТП), которое зацепит их с первой секунды. <br/><br/>
-                <strong>Но не переживай, мы здесь именно для этого! Выбирай свой новый стиль ниже.</strong>
+                {analysisText}
               </p>
             </div>
 
             <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Идеальная шапка: выбери вариант</h2>
-            <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>Мы создали 3 мощных варианта специально для тебя. Кликни на тот, который нравится больше.</p>
+            <p style={{ color: '#4b5563', marginBottom: '1.5rem' }}>ИИ создал 3 варианта специально для тебя. Кликни на тот, который нравится больше.</p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginBottom: '3rem' }}>
               {bioVariants.map((bio, index) => (
@@ -144,28 +200,6 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
                   <pre style={{ margin: 0, fontFamily: 'Inter, sans-serif', color: '#111827', fontWeight: 500, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{bio}</pre>
                 </button>
               ))}
-            </div>
-
-            <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Новая энергия профиля ✨</h2>
-            
-            <div style={{ 
-              borderRadius: '24px', 
-              position: 'relative',
-              overflow: 'hidden',
-              height: '300px',
-              marginBottom: '2rem'
-            }}>
-              <img 
-                src="https://images.unsplash.com/photo-1492613146440-c11c50058b87?w=1200&h=600&fit=crop" 
-                alt="Luxury Aesthetic"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right, rgba(0,0,0,0.8), transparent)' }} />
-              
-              <div style={{ position: 'absolute', bottom: '2rem', left: '2rem', maxWidth: '400px' }}>
-                <h3 style={{ color: 'white', fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'Outfit' }}>Продающий визуал</h3>
-                <p style={{ color: '#d1d5db', lineHeight: 1.5 }}>Такой должна быть эстетика твоего бренда. Клиенты готовы платить больше за красивую упаковку.</p>
-              </div>
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
