@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, ArrowRight, Heart, Crown } from 'lucide-react';
-import type { UserProfile } from '../App';
+import type { UserProfile } from '../constants';
 
 interface OnboardingProps {
   onComplete: (profile: UserProfile) => void;

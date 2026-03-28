@@ -14,7 +14,6 @@ export const MainLayout = ({ children }: MainLayoutProps) => {
           <span style={{ fontSize: '1.5rem', margin: 0, fontFamily: 'Outfit', fontWeight: 700, color: 'var(--text-heading)' }}>Content Factory</span>
         </div>
         
-        {/* Simple Login Button placed back without the Switcher */}
         <button style={{ background: 'transparent', border: '1px solid #111827', padding: '0.5rem 1.5rem', borderRadius: '99px', fontFamily: 'Outfit', fontWeight: 600, cursor: 'pointer' }}>
           Войти
         </button>

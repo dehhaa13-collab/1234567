@@ -1,20 +1,26 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { UploadCloud, Wand2, XCircle, AlertTriangle } from 'lucide-react';
+import { UploadCloud, Wand2, AlertTriangle } from 'lucide-react';
 
 export const ReelsGeneratorTab = () => {
-  const [step, setStep] = useState<'upload' | 'error'>('upload');
+  const [step, setStep] = useState<'upload' | 'unavailable'>('upload');
   const [fileName, setFileName] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = (file: File) => {
     setFileName(file.name);
-    setStep('error');
+    setStep('unavailable');
+  };
+
+  const resetUpload = () => {
+    setStep('upload');
+    setFileName('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ padding: '2rem 0' }}>
-      
+
       <div style={{ marginBottom: '2rem' }}>
         <h2 style={{ fontSize: '2rem', marginBottom: '1rem', fontFamily: 'Outfit', color: '#111827' }}>AI-Монтажер (Магия)</h2>
         <p style={{ color: '#4b5563', fontSize: '1.1rem' }}>
@@ -23,17 +29,17 @@ export const ReelsGeneratorTab = () => {
       </div>
 
       <AnimatePresence mode="wait">
-        
+
         {step === 'upload' && (
-          <motion.div 
+          <motion.div
             key="upload"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            style={{ 
-              background: 'white', 
-              border: '2px dashed #ec4899', 
-              borderRadius: '24px', 
+            style={{
+              background: 'white',
+              border: '2px dashed #ec4899',
+              borderRadius: '24px',
               padding: '4rem 2rem',
               textAlign: 'center',
               cursor: 'pointer',
@@ -50,10 +56,10 @@ export const ReelsGeneratorTab = () => {
               <Wand2 size={18} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
               Выбрать файл
             </button>
-            <input 
-              type="file" 
-              accept="video/*" 
-              style={{ display: 'none' }} 
+            <input
+              type="file"
+              accept="video/*"
+              style={{ display: 'none' }}
               ref={fileInputRef}
               onChange={(e) => {
                 if (e.target.files && e.target.files.length > 0) {
@@ -64,17 +70,12 @@ export const ReelsGeneratorTab = () => {
           </motion.div>
         )}
 
-        {step === 'error' && (
-          <motion.div 
-            key="error"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-          >
-            <div style={{ 
-              background: '#fffbeb', 
-              padding: '2.5rem', 
-              borderRadius: '24px', 
+        {step === 'unavailable' && (
+          <motion.div key="unavailable" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+            <div style={{
+              background: '#fffbeb',
+              padding: '2.5rem',
+              borderRadius: '24px',
               border: '1px solid #fde68a',
               textAlign: 'center',
               boxShadow: '0 10px 15px -3px rgba(0,0,0,0.05)'
@@ -83,21 +84,21 @@ export const ReelsGeneratorTab = () => {
               <h3 style={{ color: '#92400e', fontSize: '1.75rem', marginBottom: '1rem', fontFamily: 'Outfit' }}>
                 Функция в разработке
               </h3>
-              
+
               {fileName && (
                 <p style={{ color: '#92400e', marginBottom: '1rem', fontSize: '0.95rem' }}>
                   Файл «{fileName}» загружен, но обработка пока недоступна.
                 </p>
               )}
-              
+
               <p style={{ color: '#78350f', lineHeight: 1.7, maxWidth: '550px', margin: '0 auto 1rem auto', fontSize: '1.05rem' }}>
                 AI-монтаж видео требует подключения к серверу обработки видео (FFmpeg + GPU). На данный момент эта функция находится в активной разработке.
               </p>
-              
-              <div style={{ 
-                background: 'white', 
-                padding: '1.5rem', 
-                borderRadius: '16px', 
+
+              <div style={{
+                background: 'white',
+                padding: '1.5rem',
+                borderRadius: '16px',
                 border: '1px solid #fde68a',
                 maxWidth: '450px',
                 margin: '1.5rem auto',
@@ -112,15 +113,7 @@ export const ReelsGeneratorTab = () => {
                 </ul>
               </div>
 
-              <button 
-                onClick={() => {
-                  setStep('upload');
-                  setFileName('');
-                  if (fileInputRef.current) fileInputRef.current.value = '';
-                }} 
-                className="btn-primary"
-                style={{ marginTop: '1.5rem' }}
-              >
+              <button onClick={resetUpload} className="btn-primary" style={{ marginTop: '1.5rem' }}>
                 Вернуться назад
               </button>
             </div>

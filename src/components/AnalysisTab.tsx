@@ -1,25 +1,20 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Sparkles, AlertTriangle, CheckCircle2, ChevronRight, XCircle } from 'lucide-react';
-import type { UserProfile } from '../App';
+import { Search, Sparkles, AlertTriangle, CheckCircle2, ChevronRight } from 'lucide-react';
+import type { UserProfile } from '../constants';
+import { NICHE_LABELS } from '../constants';
+import { Spinner, ErrorBlock } from './ui';
 import { askGemini } from '../services/gemini';
-
-const nicheLabels: Record<string, string> = {
-  hair: 'волосы (стилист)',
-  permanent: 'перманентный макияж',
-  lashes: 'ресницы/брови',
-  nails: 'ногти (нейл-мастер)',
-};
 
 export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile | null, onNext: () => void }) => {
   const [step, setStep] = useState<'form' | 'analyzing' | 'results' | 'error'>('form');
   const [url, setUrl] = useState('');
-  const [selectedBio, setSelectedBio] = useState<number>(0);
+  const [selectedBio, setSelectedBio] = useState(0);
   const [bioVariants, setBioVariants] = useState<string[]>([]);
   const [analysisText, setAnalysisText] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const nicheLabel = nicheLabels[userProfile?.niche || ''] || 'бьюти';
+  const nicheLabel = NICHE_LABELS[userProfile?.niche || ''] || 'бьюти';
 
   const handleStartAnalysis = async () => {
     if (!url) return;
@@ -59,7 +54,6 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
 
     try {
       const text = result.text;
-      
       const analysisMatch = text.match(/---АНАЛИЗ---([\s\S]*?)---БИО1---/);
       const bio1Match = text.match(/---БИО1---([\s\S]*?)---БИО2---/);
       const bio2Match = text.match(/---БИО2---([\s\S]*?)---БИО3---/);
@@ -88,9 +82,8 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
 
   return (
     <div style={{ position: 'relative' }}>
-      
       <AnimatePresence mode="wait">
-        
+
         {step === 'form' && (
           <motion.div
             key="form"
@@ -103,20 +96,18 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
             <p style={{ marginBottom: '2rem', color: 'var(--text-main)' }}>
               Отлично, {userProfile?.name || 'мастер'}! Введи ссылку или никнейм. ИИ проанализирует профиль с учетом твоей ниши ({nicheLabel}) и твоей главной боли ({userProfile?.problem?.toLowerCase() || 'нехватка клиентов'}).
             </p>
-            
+
             <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-              <div>
-                <div style={{ position: 'relative', maxWidth: '400px' }}>
-                  <Search size={20} color="#9ca3af" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
-                  <input 
-                    type="text" 
-                    className="input-field" 
-                    placeholder="@tvoi_nik или ссылка" 
-                    style={{ paddingLeft: '3rem' }}
-                    value={url}
-                    onChange={(e) => setUrl(e.target.value)}
-                  />
-                </div>
+              <div style={{ position: 'relative', maxWidth: '400px' }}>
+                <Search size={20} color="#9ca3af" style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)' }} />
+                <input
+                  type="text"
+                  className="input-field"
+                  placeholder="@tvoi_nik или ссылка"
+                  style={{ paddingLeft: '3rem' }}
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
               </div>
 
               <div>
@@ -129,52 +120,22 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
         )}
 
         {step === 'analyzing' && (
-          <motion.div key="analyzing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ textAlign: 'center', padding: '4rem 0' }}>
-            <div style={{ width: '56px', height: '56px', border: '4px solid #fdf2f8', borderTop: '4px solid #ec4899', borderRadius: '50%', margin: '0 auto', animation: 'spin 1s linear infinite' }} />
-            <p style={{ marginTop: '1.5rem', color: 'var(--text-heading)', fontWeight: 600, fontSize: '1.25rem' }}>ИИ анализирует профиль...</p>
-            <p style={{ color: '#db2777', marginTop: '0.5rem' }}>Запрос отправлен в Gemini. Ожидаем ответ.</p>
-            <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-          </motion.div>
+          <Spinner title="ИИ анализирует профиль..." subtitle="Запрос отправлен в Gemini. Ожидаем ответ." />
         )}
 
         {step === 'error' && (
-          <motion.div key="error" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ padding: '2rem 0' }}>
-            <div style={{ 
-              background: '#fef2f2', 
-              padding: '2rem', 
-              borderRadius: '20px', 
-              border: '1px solid #fecaca',
-              textAlign: 'center'
-            }}>
-              <XCircle color="#ef4444" size={48} style={{ margin: '0 auto 1rem auto' }} />
-              <h3 style={{ color: '#991b1b', fontSize: '1.5rem', marginBottom: '1rem', fontFamily: 'Outfit' }}>
-                Не удалось выполнить анализ
-              </h3>
-              <p style={{ color: '#7f1d1d', lineHeight: 1.6, marginBottom: '2rem', maxWidth: '500px', margin: '0 auto 2rem auto' }}>
-                {errorMessage}
-              </p>
-              <button 
-                className="btn-primary" 
-                onClick={() => setStep('form')}
-                style={{ margin: '0 auto' }}
-              >
-                Попробовать ещё раз
-              </button>
-            </div>
-          </motion.div>
+          <ErrorBlock title="Не удалось выполнить анализ" message={errorMessage} onRetry={() => setStep('form')} />
         )}
 
         {step === 'results' && (
           <motion.div key="results" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ marginTop: '0.5rem' }}>
-            
+
             <div style={{ background: '#fef2f2', padding: '1.5rem', borderRadius: '16px', border: '1px solid #fecaca', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '1rem' }}>
                 <AlertTriangle color="#ef4444" size={24} />
                 <h3 style={{ margin: 0, color: '#991b1b', fontSize: '1.25rem' }}>Почему у тебя {userProfile?.problem?.toLowerCase() || 'мало клиентов'}?</h3>
               </div>
-              <p style={{ color: '#7f1d1d', lineHeight: 1.6, margin: 0 }}>
-                {analysisText}
-              </p>
+              <p style={{ color: '#7f1d1d', lineHeight: 1.6, margin: 0 }}>{analysisText}</p>
             </div>
 
             <h2 style={{ fontSize: '1.75rem', marginBottom: '1.5rem', fontFamily: 'Outfit' }}>Идеальная шапка: выбери вариант</h2>
@@ -182,7 +143,7 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginBottom: '3rem' }}>
               {bioVariants.map((bio, index) => (
-                <button 
+                <button
                   key={index}
                   onClick={() => setSelectedBio(index)}
                   style={{
@@ -206,13 +167,8 @@ export const AnalysisTab = ({ userProfile, onNext }: { userProfile: UserProfile 
               <button onClick={() => setStep('form')} style={{ flex: 1, padding: '1rem 2rem', cursor: 'pointer', background: 'transparent', border: '1px solid #111827', borderRadius: '99px', fontWeight: 600, fontFamily: 'Outfit', textAlign: 'center' }}>
                 Попробовать другой ник
               </button>
-              
-              <button 
-                onClick={onNext} 
-                className="btn-primary" 
-                style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}
-              >
-                Перейти к Этапу 2 (Разбор визуала) <ChevronRight size={20} />
+              <button onClick={onNext} className="btn-primary" style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px' }}>
+                Перейти к Этапу 2 <ChevronRight size={20} />
               </button>
             </div>
 

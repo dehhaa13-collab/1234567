@@ -6,7 +6,7 @@ import { AnalysisTab } from '../components/AnalysisTab';
 import { VisualAnalysisTab } from '../components/VisualAnalysisTab';
 import { ContentPlanTab } from '../components/ContentPlanTab';
 import { ReelsGeneratorTab } from '../components/ReelsGeneratorTab';
-import type { UserProfile } from '../App';
+import type { UserProfile } from '../constants';
 
 interface HomeProps {
   userProfile: UserProfile | null;

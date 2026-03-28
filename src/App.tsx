@@ -2,15 +2,9 @@ import { useState } from 'react';
 import { MainLayout } from './layouts/MainLayout';
 import { Home } from './pages/Home';
 import { Onboarding } from './pages/Onboarding';
+import type { UserProfile } from './constants';
 
 export type AppState = 'onboarding' | 'dashboard';
-
-export interface UserProfile {
-  name: string;
-  niche: string;
-  experience: string;
-  problem: string;
-}
 
 export const App = () => {
   const [appState, setAppState] = useState<AppState>('onboarding');
